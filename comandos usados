@@ -1,0 +1,57 @@
+Video 1
+sudo dnf install -y gnupg2
+gpg2 --full-generate-key
+gpg2 --list-keys
+gpg2 -e -r Carlos archivo.txt
+sha256sum archivo.txt
+sha256sum archivo_descifrado.txt
+gpg2 -d archivo.txt.gpg > archivo_descifrado.txt
+
+#___________________________________________________#
+
+Video 2
+---PARTE 1---: IPTABLES
+sudo dnf install -y iptables iptables-services
+sudo systemctl enable --now iptables
+nc -zv localhost 22
+nc -zv localhost 80
+nc -zv localhost 21
+sudo iptables -A INPUT -p tcp --dport 22 -j DROP
+sudo iptables -A INPUT -p tcp --dport 80 -j DROP
+sudo iptables -A INPUT -p tcp --dport 21 -j DROP
+sudo iptables -L -n --line-numbers
+sudo iptables -D INPUT 1 (numero de la regla cuando haces el line-numbers)
+sudo iptables -D INPUT 1
+sudo iptables -D INPUT 1
+
+SI QUIERES QUE LAS REGLAS SE HAGAN PERMANENTES
+sudo service iptables save
+sudo systemctl restart iptables
+
+
+
+---PARTE 2---: FIREWALL-CMD
+ ------------------ BLOQUEAR ---------------------------
+sudo firewall-cmd --permanent --remove-service=http
+sudo firewall-cmd --permanent --remove-port=80/tcp
+sudo firewall-cmd --permanent --remove-port=22/tcp
+sudo firewall-cmd --reload
+sudo systemctl restart httpd
+sudo systemctl restart sshd
+
+VERIFICAR QUE EL ACCESO ESTA BLOQUEADO
+curl http://10.0.0.69 : deberá decir que el puerto 80 esta bloqueado
+ssh carlos@10.0.0.69: deberá decir que el tiempo de espera se agoto
+
+
+--------------- DESBLOQUEAR ----------------------
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-port=80/tcp
+sudo firewall-cmd --permanent --add-port=22/tcp
+sudo firewall-cmd --reload
+sudo systemctl restart httpd
+sudo systemctl restart sshd
+
+VERIFICAR QUE EL ACCESO ESTA DESBLOQUEADO
+curl http://10.0.0.69: HOLA MUNDO
+ssh carlos@10.0.0.69: deberá de acceder normalmente
