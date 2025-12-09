@@ -1,13 +1,52 @@
 Video 1
-sudo dnf install -y gnupg2
-gpg2 --full-generate-key
-gpg2 --list-keys
-gpg2 -e -r Carlos archivo.txt
-sha256sum archivo.txt
-sha256sum archivo_descifrado.txt
-gpg2 -d archivo.txt.gpg > archivo_descifrado.txt
+gpg2 
 
-#___________________________________________________#
+dnf install gnupg2* -y
+cd Escritorio
+mkdir cifrando
+cd cifrando
+
+gpg2 --full-generate-key
+
+1- rsa and rsa
+2- 4096
+3- caducar: 0
+4- $(nombre): Carlos
+5- correo: 20250892@itla.edu.do
+6- comentario: nada xd
+7- vale
+
+.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+nano prueba.txt
+carlos luis feliz catano
+2025 0892
+
+ctrl + o
+enter
+ctrl + x
+.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+
+CIFRAR:
+gpg2 -e -r $(nombre) prueba.txt
+
+VERIFICAR:
+sha256sum prueba.txt
+
+RESULTADO:
+prueba.txt.gpg
+
+VERIFICAR:
+sha256sum prueba.txt
+
+DESCIFRAR:
+gpg2 -d prueba.txt.gpg > prueba_decrifada.txt
+
+VERIFICAR:
+sha256sum prueba.txt
+
+
+
+#_______________________________________________________________________________________#
 
 Video 2
 ---PARTE 1---: IPTABLES
