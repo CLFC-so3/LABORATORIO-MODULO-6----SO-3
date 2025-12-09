@@ -52,9 +52,23 @@ Video 2
 ---PARTE 1---: IPTABLES
 sudo dnf install -y iptables iptables-services
 sudo systemctl enable --now iptables
-nc -zv localhost 22
-nc -zv localhost 80
-nc -zv localhost 21
+
+COMPROBAR PUERTO 21
+dnf install vsftpd telnet -y
+systemctl enable vsftpd
+systemctl start vsftpd
+
+telnet 10.0.0.70 21
+----------------------------------------------
+
+COMPROBAR PUERTO 80 
+Windows:
+curl http://10.0.0.70
+----------------------------------------------
+
+COMPROBAR PUERTO 22
+ssh carlos@10.0.0.70
+
 
 .-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-.
 ANTES DE HACER ESTAS REGLAS RECUERDA QUE YA HAY UNAS QUE ESTAN HECHAS, DE HECHO CUANDO
