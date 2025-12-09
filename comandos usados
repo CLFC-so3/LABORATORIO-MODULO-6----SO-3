@@ -124,3 +124,60 @@ sudo systemctl restart sshd
 VERIFICAR QUE EL ACCESO ESTA DESBLOQUEADO
 curl http://10.0.0.69: HOLA MUNDO
 ssh carlos@10.0.0.69: deberá de acceder normalmente
+
+("TE CONOZCO Y SÉ QUE NO HAY NADIE MA SALAO QUE TU, SI ALGO DE ESO NO TE SALE PRUEBA CON ESTO")
+
+iptables
+
+COMPROBAR PUERTO 21
+
+(archivo de configuracion por si acaso: nano /etc/vsftpd/vsftpd.conf)
+dnf install vsftpd telnet -y
+systemctl enable vsftpd
+systemctl start vsftpd
+
+telnet 10.0.0.70 21
+
+----------------------------------------------
+
+COMPROBAR PUERTO 80 
+
+Windows:
+curl http://10.0.0.70
+
+----------------------------------------------
+
+COMPROBAR PUERTO 22
+
+ssh carlos@10.0.0.70
+
+
+#_______________________________________________________________#
+
+firewall
+
+BLOQUEAR PUERTO 80
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" port port="80" protocol="tcp" reject'
+
+BLOQUEAR PUERTO 22
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" port port="22" protocol="tcp" reject'
+
+BLOQUEAR PUERTO 21
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" port port="21" protocol="tcp" reject'
+
+RECARGAR FIREWALL
+sudo firewall-cmd --reload
+
+-------------------------------------------------------------------------------------------
+
+Desbloquear puerto 80
+sudo firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" port port="80" protocol="tcp" reject'
+
+Desbloquear puerto 22
+sudo firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" port port="22" protocol="tcp" reject'
+
+Desbloquear puerto 21
+sudo firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" port port="21" protocol="tcp" reject'
+
+Recargar firewalld
+sudo firewall-cmd --reload
