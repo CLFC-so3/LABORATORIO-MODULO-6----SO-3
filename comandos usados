@@ -55,6 +55,22 @@ sudo systemctl enable --now iptables
 nc -zv localhost 22
 nc -zv localhost 80
 nc -zv localhost 21
+
+.-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-.
+ANTES DE HACER ESTAS REGLAS RECUERDA QUE YA HAY UNAS QUE ESTAN HECHAS, DE HECHO CUANDO
+INTENTE BLOQUEAR EL PUERTO 22 (SSH) ANTES DE ELIMINAR ESAS REGLAS, SIMPLEMENTE NO 
+BLOQUEABA EL PUERTO, POR ESO HAZ PRIMERO:
+
+sudo iptables -L -n --line-numbers
+
+REVISA LO QUE DIGA "CHAIN INPUT" (IGNORA LO DE "CHAIN FORWARD") Y EJECUTA ESTE COMANDO HASTA
+QUE YA NO QUEDEN REGLAS EN EL "CHAIN INPUT"
+
+sudo iptables -D INPUT 1
+
+AHORA SI PUEDES SEGUIR CON LA PRACTICA
+.-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-..-.-.-.-.-.-.
+
 sudo iptables -A INPUT -p tcp --dport 22 -j DROP
 sudo iptables -A INPUT -p tcp --dport 80 -j DROP
 sudo iptables -A INPUT -p tcp --dport 21 -j DROP
