@@ -181,3 +181,182 @@ sudo firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" port port="
 
 Recargar firewalld
 sudo firewall-cmd --reload
+
+
+#________________________________________________________________________________________________________________#
+VIDEO 3
+
+NO LO HICE PERO AQUI ESTA LA PRACTICA DEL SNORT
+
+Snort 
+Instalación
+
+sudo dnf install -y gcc gcc-c++ flex bison zlib-devel libpcap-devel \
+pcre-devel pcre2-devel libdnet-devel openssl-devel libnghttp2-devel \
+luajit-devel wget tar hwloc-devel cmake make autoconf automake libtool \
+libmnl-devel libunwind-devel xz-devel gperftools-devel git
+
+mkdir ~/snort_src
+cd ~/snort_src
+
+git clone https://github.com/snort3/libdaq.git
+cd libdaq
+./bootstrap
+./configure
+make
+sudo make install
+
+echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/snort.conf
+echo "/usr/local/lib64" | sudo tee -a /etc/ld.so.conf.d/snort.conf
+sudo ldconfig
+
+cd ~/snort_src
+git clone https://github.com/snort3/snort3.git
+cd snort3
+./configure_cmake.sh --prefix=/usr/local --enable-tcmalloc
+cd build
+make -j$(nproc)
+sudo make install
+
+sudo ldconfig
+snort -V
+
+
+CREAR REGLAS 
+
+# Crear directorios necesarios
+sudo mkdir -p /usr/local/etc/snort/rules
+sudo mkdir -p /var/log/snort
+sudo mkdir -p /usr/local/etc/snort/so_rules
+sudo mkdir -p /usr/local/etc/snort/lists
+
+# Crear archivo de configuración básico
+sudo touch /usr/local/etc/snort/snort.lua
+
+
+# Editar el archivo de configuración mínimo
+sudo nano /usr/local/etc/snort/snort.lua
+
+
+ctrl + 7 (combo que sirve para saltar a la linea que quieras)
+ctrl + 7 194
+
+COMO DEBE DE QUEDAR 
+
+-------------------------------------------------------------------------------------------------------------------------------
+variables = default_variables
+        rules = [[
+                alert icmp any any -> $HOME_NET any ( msg:"ALERTA! TRAFICO ICMP DETECTADO HACIA RED LOCAL"; sid:10000001; )
+
+                alert tcp any any -> $HOME_NET 21 ( msg:"ALERTA! TRAFICO  FTP DETECTADO"; sid:10000002; )
+
+                alert tcp any any -> $HOME_NET 22 ( msg:"ALERTA! TRAFICO SSH DETECTADO"; sid:10000003; )
+
+                alert tcp any any -> $HOME_NET any ( msg:"ALERTA! TRAFICO HTTP DETECTADO"; sid:10000004; )
+]]
+
+ctrl + o
+enter
+ctrl + x
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+1. sudo nano /usr/local/etc/snort/snort_simple.lua
+
+---------------------------------------------------------------------------
+-- Configuración mínima de Snort para la práctica
+---------------------------------------------------------------------------
+
+-- Definir variables de red
+HOME_NET = 'any'
+EXTERNAL_NET = 'any'
+
+-- Configuración DAQ
+daq = 
+{
+    inputs = { 'ens160' },
+    module_dirs = { '/usr/local/lib/daq' }
+}
+
+-- Configuración IPS con reglas personalizadas
+ips =
+{
+    enable_builtin_rules = false,
+    variables = 
+    {
+        nets = 
+        {
+            HOME_NET = HOME_NET,
+            EXTERNAL_NET = EXTERNAL_NET
+        }
+    },
+    include = '/usr/local/etc/snort/rules/local.rules'
+}
+
+-- Módulos básicos necesarios
+stream = { }
+stream_tcp = { }
+stream_udp = { }
+stream_icmp = { }
+
+normalizer = { }
+
+network = { }
+
+-- Salida de alertas
+alert_fast = 
+{
+    file = true
+}
+
+-- Directorio de logs
+output = 
+{
+    logdir = '/var/log/snort'
+}
+
+ctrl + o
+enter
+ctrl + x
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+2. sudo nano /usr/local/etc/snort/rules/local.rules
+
+alert icmp any any -> any any (msg:"ICMP Ping detectado hacia el host"; sid:1000001; rev:1;)
+alert tcp any any -> any 21 (msg:"Trafico detectado hacia puerto FTP (21/tcp)"; sid:1000002; rev:1;)
+alert tcp any any -> any 22 (msg:"Trafico detectado hacia puerto SSH (22/tcp)"; sid:1000003; rev:1;)
+alert tcp any any -> any 80 (msg:"Trafico detectado hacia puerto HTTP (80/tcp)"; sid:1000004; rev:1;)
+
+ctrl + o
+enter 
+ctrl + x
+
+3. sudo mkdir -p /var/log/snort
+
+4. Verificar instalación de libdaq
+sudo ldconfig
+ls /usr/local/lib/daq/
+
+5. sudo snort -c /usr/local/etc/snort/snort_simple.lua -i ens160 -A cmg -q
+
+6. Ver las alertas en otro terminal
+Mientras Snort está corriendo, abre otra terminal:
+sudo tail -f /var/log/snort/alert_fast.txt
+
+
+7. Hacer pruebas e ir viendo resultados en la otra terminal 
+
+Windows: ping 10.0.0.70
+
+Fedora: 
+dnf install telnet vsftpd -y
+systemctl enable vsftpd
+systemctl start vsftpd
+
+telnet 10.0.0.70 21
+
+ssh carlos@10.0.0.70 
+
+ESTATE ATENTO QUE EN LA OTRA TERMINAL DONDE ESTAS LEYENDO LOS LOGS, ESO SE MUEVE RAPIDISIMO 
